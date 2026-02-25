@@ -1,0 +1,23 @@
+# Normalise all text files to LF in the repo; let git convert to CRLF on Windows checkout.
+* text=auto eol=lf
+
+# Python source
+*.py text eol=lf
+
+# Config / docs
+*.md text eol=lf
+*.txt text eol=lf
+*.cfg text eol=lf
+*.ini text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+.env.example text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Binary — never convert
+*.pdf binary
+*.db binary
+*.pyc binary

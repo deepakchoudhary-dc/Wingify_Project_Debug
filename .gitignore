@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+
+# Database
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data directory — ignore all uploaded files, keep the directory
+data/*
+!data/.gitkeep
+
+# Outputs — ignore all generated analysis files, keep the directory
+outputs/*
+!outputs/.gitkeep
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
