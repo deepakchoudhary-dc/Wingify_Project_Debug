@@ -182,7 +182,7 @@ def assess_risk_factors(financial_data: str) -> str:
     """Identify risk-related terms and classify risk categories."""
     import os
     # Guard: reject file paths — this tool expects document text, not a path.
-    if os.path.exists(financial_data) or (len(financial_data) < 500 and "/" in financial_data or "\\" in financial_data):
+    if os.path.exists(financial_data) or (len(financial_data) < 500 and ("/" in financial_data or "\\" in financial_data)):
         return (
             "TOOL_ERROR: 'Assess Risk Factors' received what looks like a file path instead of "
             "document text. Extract the document body text from the verification task context "
