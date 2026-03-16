@@ -26,8 +26,13 @@ def _env_positive_int(name: str, default: int) -> int:
 MAX_EXTRACT_CHARS = _env_positive_int("MAX_EXTRACT_CHARS", 150000)
 
 # Real-time web search for market context.
-search_tool = SerperDevTool()
-
+if os.getenv("SERPER_API_KEY"):
+    search_tool = SerperDevTool()
+else:
+    @tool("Search Internet")
+    def search_tool(query: str) -> str:
+        """Fallback mock search tool when SERPER_API_KEY is not set."""
+        return "Search feature is disabled (no API key). Proceed using only the document context."
 
 def _word_boundary_match(keyword: str, text: str) -> bool:
     """Match whole terms only to avoid substring false positives."""

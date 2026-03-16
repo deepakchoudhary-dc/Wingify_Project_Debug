@@ -24,16 +24,12 @@ load_dotenv()
 
 
 def _build_llm() -> LLM:
-    model_name = os.getenv("MODEL_NAME", "gemini/gemini-2.0-flash")
-
-    if model_name.startswith("openai"):
-        api_key = os.getenv("OPENAI_API_KEY", "")
-    elif model_name.startswith("gemini"):
-        api_key = os.getenv("GEMINI_API_KEY", "")
-    else:
-        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
-
-    return LLM(model=model_name, api_key=api_key)
+    """Built to rely on local Ollama via the user's explicit request."""
+    model_name = os.getenv("MODEL_NAME", "ollama/qwen3:1.7b")
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    
+    # CrewAI (LiteLLM) connects to Ollama automatically when prefixed with ollama/
+    return LLM(model=model_name, base_url=base_url)
 
 
 def build_agents() -> tuple[Agent, Agent, Agent, Agent]:

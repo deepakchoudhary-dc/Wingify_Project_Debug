@@ -6,39 +6,42 @@ crewai==0.130.0
 crewai-tools==0.47.1
 
 # ── Web Framework ─────────────────────────────────────────────────────────────
-fastapi==0.110.3
-uvicorn>=0.29.0
-python-multipart>=0.0.9
+fastapi==0.133.0
+uvicorn==0.41.0
+python-multipart==0.0.22
 
 # ── PDF Processing ────────────────────────────────────────────────────────────
-pypdf>=4.0.0
+pypdf==5.9.0
 
 # ── Environment & Config ─────────────────────────────────────────────────────
-python-dotenv>=1.0.0
-click==8.1.7
+python-dotenv==1.2.1
+click==8.3.1
 
 # ── Data Validation (crewai 0.130.0 requires pydantic v2) ────────────────────
-pydantic>=2.0.0
+pydantic==2.12.5
 
 # ── Database (Bonus Feature) ─────────────────────────────────────────────────
-sqlalchemy>=2.0.0
+sqlalchemy==2.0.47
 
 # ── Queue Worker (Bonus Feature — optional, requires Redis server) ───────────
-celery>=5.3.0
-redis>=5.0.0
+celery==5.6.2
+redis==7.2.0
 
 # ── Google AI (LLM provider) ─────────────────────────────────────────────────
 google-generativeai>=0.5.4
 
 # ── OpenAI (alternative LLM provider) ────────────────────────────────────────
-openai>=1.30.5
+openai==1.109.1
 
 # ── LangChain (transitive deps) ──────────────────────────────────────────────
-langchain-core>=0.1.52
-langsmith>=0.1.67
+langchain-core==0.3.83
+langsmith==0.3.45
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
-numpy>=1.26.4
-pandas>=2.2.2
-Jinja2>=3.1.4
-jsonschema>=4.22.0
+numpy==2.2.6
+pandas==2.3.3
+Jinja2==3.1.6
+jsonschema==4.26.0
+
+# ── Front-end ─────────────────────────────────────────────────────────────────
+streamlit>=1.32.0
