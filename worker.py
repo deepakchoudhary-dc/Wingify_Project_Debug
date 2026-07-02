@@ -47,21 +47,9 @@ def analyze_document_task(
         )
 
         # Import inside task function to avoid import cycles at startup.
-        from crewai import Crew, Process
-        from agents import build_agents
-        from task import build_financial_tasks
+        from pipeline import run_financial_pipeline
 
-        verifier, financial_analyst, investment_advisor, risk_assessor = build_agents()
-        tasks = build_financial_tasks(verifier, financial_analyst, investment_advisor, risk_assessor)
-        financial_crew = Crew(
-            agents=[verifier, financial_analyst, investment_advisor, risk_assessor],
-            tasks=tasks,
-            process=Process.sequential,
-            verbose=False,
-        )
-
-        result = financial_crew.kickoff(inputs={"query": query, "file_path": file_path})
-        analysis_text = str(result)
+        analysis_text = run_financial_pipeline(query, file_path)
 
         if "TOOL_ERROR:" in analysis_text:
             raise RuntimeError("Analysis pipeline encountered tool failure.")

@@ -29,9 +29,7 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 
-from crewai import Crew, Process
-from agents import build_agents
-from task import build_financial_tasks
+from pipeline import run_financial_pipeline, format_json_to_markdown
 from database import (
     init_db,
     save_analysis_result,
@@ -230,20 +228,8 @@ async def _persist_upload_pdf(uploaded: UploadFile, destination: Path) -> None:
 
 
 def run_crew(query: str, file_path: str) -> str:
-    """Run one full crew execution."""
-    verifier, financial_analyst, investment_advisor, risk_assessor = build_agents()
-    tasks = build_financial_tasks(verifier, financial_analyst, investment_advisor, risk_assessor)
-    financial_crew = Crew(
-        agents=[verifier, financial_analyst, investment_advisor, risk_assessor],
-        tasks=tasks,
-        process=Process.sequential,
-        verbose=False,
-    )
-    result = financial_crew.kickoff(inputs={"query": query, "file_path": file_path})
-    result_text = str(result)
-    if "TOOL_ERROR:" in result_text:
-        raise RuntimeError("Analysis pipeline encountered tool failure.")
-    return result_text
+    """Run one full crew execution using the centralized pipeline."""
+    return run_financial_pipeline(query, file_path)
 
 
 def _cleanup_file(path: str) -> None:
@@ -357,7 +343,7 @@ async def analyze_document(
                 out.write(f"File: {file.filename}\n")
                 out.write(f"Date: {datetime.utcnow().isoformat()}\n")
                 out.write(f"{'=' * 80}\n\n")
-                out.write(analysis_result)
+                out.write(format_json_to_markdown(analysis_result))
         except Exception:
             logger.warning("Failed to write analysis artifact to %s", output_path, exc_info=True)
 

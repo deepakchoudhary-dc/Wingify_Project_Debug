@@ -18,18 +18,37 @@ from tools import (
     read_financial_document,
     analyze_investment_data,
     assess_risk_factors,
+    fetch_stock_quote,
 )
 
 load_dotenv()
 
 
 def _build_llm() -> LLM:
-    """Built to rely on local Ollama via the user's explicit request."""
-    model_name = os.getenv("MODEL_NAME", "ollama/qwen3:1.7b")
-    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    """Builds a CrewAI LLM instance dynamically based on the configured model."""
+    model_name = os.getenv("MODEL_NAME", "gemini/gemini-2.0-flash")
     
-    # CrewAI (LiteLLM) connects to Ollama automatically when prefixed with ollama/
-    return LLM(model=model_name, base_url=base_url)
+    # Parse provider from the model name (e.g. gemini/gemini-2.0-flash -> gemini)
+    provider = "openai"
+    if "/" in model_name:
+        provider = model_name.split("/")[0].lower()
+        
+    kwargs = {"model": model_name}
+    
+    # Only configure base_url if it's a local model like Ollama
+    if provider == "ollama":
+        base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        kwargs["base_url"] = base_url
+    elif provider == "gemini":
+        api_key = os.getenv("GEMINI_API_KEY")
+        if api_key and api_key != "your_gemini_api_key_here":
+            kwargs["api_key"] = api_key
+    elif provider == "openai":
+        api_key = os.getenv("OPENAI_API_KEY")
+        if api_key and api_key != "your_openai_api_key_here":
+            kwargs["api_key"] = api_key
+            
+    return LLM(**kwargs)
 
 
 def build_agents() -> tuple[Agent, Agent, Agent, Agent]:
@@ -68,7 +87,7 @@ def build_agents() -> tuple[Agent, Agent, Agent, Agent]:
             "Experienced buy-side analyst specializing in fundamentals, trend analysis, "
             "and concise decision-grade reporting."
         ),
-        tools=[search_tool],
+        tools=[search_tool, fetch_stock_quote],
         llm=llm,
         verbose=False,
         max_iter=5,
@@ -86,7 +105,7 @@ def build_agents() -> tuple[Agent, Agent, Agent, Agent]:
             "Portfolio advisor focused on risk-adjusted recommendations grounded in "
             "documented fundamentals."
         ),
-        tools=[analyze_investment_data, search_tool],
+        tools=[analyze_investment_data, search_tool, fetch_stock_quote],
         llm=llm,
         verbose=False,
         max_iter=5,

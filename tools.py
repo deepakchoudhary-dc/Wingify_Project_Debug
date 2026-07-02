@@ -58,7 +58,11 @@ def read_financial_document(file_path: str) -> str:
         truncated = False
 
         for page_num, page in enumerate(reader.pages, start=1):
-            content = page.extract_text() or ""
+            try:
+                content = page.extract_text(extraction_mode="layout") or ""
+            except Exception:
+                content = page.extract_text() or ""
+                
             if not content.strip():
                 continue
 
@@ -94,6 +98,56 @@ def read_financial_document(file_path: str) -> str:
         return extracted
     except Exception as exc:
         return f"TOOL_ERROR: Failed to read PDF file: {exc}"
+
+
+@tool("Fetch Stock Quote")
+def fetch_stock_quote(ticker: str) -> str:
+    """Fetch real-time stock quote and financial summary for a given ticker symbol (e.g., AAPL, MSFT, GOOG)."""
+    import urllib.request
+    import json
+
+    ticker = ticker.strip().upper()
+    if not ticker:
+        return "TOOL_ERROR: Ticker symbol is empty."
+
+    try:
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d"
+        req = urllib.request.Request(
+            url,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode())
+
+        result_list = data.get("chart", {}).get("result", [])
+        if not result_list:
+            return f"No stock data found for ticker '{ticker}'."
+
+        meta = result_list[0].get("meta", {})
+        if not meta:
+            return f"No stock data found for ticker '{ticker}'."
+
+        current_price = meta.get("regularMarketPrice")
+        prev_close = meta.get("previousClose")
+        currency = meta.get("currency", "USD")
+        exchange = meta.get("exchangeName")
+
+        if current_price is None or prev_close is None:
+            return f"Stock quote metadata incomplete for ticker '{ticker}'."
+
+        change = current_price - prev_close
+        pct_change = (change / prev_close) * 100 if prev_close else 0
+
+        summary = (
+            f"Stock Quote for {ticker} ({exchange}):\n"
+            f"  Current Price: {current_price} {currency}\n"
+            f"  Previous Close: {prev_close} {currency}\n"
+            f"  Daily Change: {change:+.2f} ({pct_change:+.2f}%)\n"
+            f"  Currency: {currency}\n"
+        )
+        return summary
+    except Exception as e:
+        return f"TOOL_ERROR: Failed to fetch stock data for '{ticker}': {e}"
 
 
 @tool("Analyze Investment Data")
